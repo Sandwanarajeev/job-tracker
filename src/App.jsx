@@ -28,23 +28,47 @@ function App() {
   };
 
   const updateStatus = (id, status) => {
-    setJobs(jobs.map(j => j.id === id ? { ...j, status } : j));
+    setJobs(jobs.map(j => (j.id === id ? { ...j, status } : j)));
   };
 
-  const removeJob = (id) => {
+  const removeJob = id => {
     setJobs(jobs.filter(j => j.id !== id));
   };
 
-  const shownJobs = filter === "All" ? jobs : jobs.filter(j => j.status === filter);
+  const shownJobs =
+    filter === "All" ? jobs : jobs.filter(j => j.status === filter);
+
+  // 🔔 Follow-up today
+  const today = new Date().toISOString().slice(0, 10);
+  const followUpsToday = jobs.filter(j => j.date === today);
 
   return (
     <div className="app">
+      {followUpsToday.length > 0 && (
+        <div className="notification">
+          🔔 Follow-up today:{" "}
+          {followUpsToday.map(j => j.company).join(", ")}
+        </div>
+      )}
+
       <h1>Job Application Tracker</h1>
 
       <div className="form-row">
-        <input placeholder="Company" value={company} onChange={e => setCompany(e.target.value)} />
-        <input placeholder="Role" value={role} onChange={e => setRole(e.target.value)} />
-        <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+        <input
+          placeholder="Company"
+          value={company}
+          onChange={e => setCompany(e.target.value)}
+        />
+        <input
+          placeholder="Role"
+          value={role}
+          onChange={e => setRole(e.target.value)}
+        />
+        <input
+          type="date"
+          value={date}
+          onChange={e => setDate(e.target.value)}
+        />
         <button onClick={addJob}>Add</button>
       </div>
 
@@ -52,7 +76,9 @@ function App() {
         <p>Total jobs: {jobs.length}</p>
         <select value={filter} onChange={e => setFilter(e.target.value)}>
           <option>All</option>
-          {statuses.map(s => <option key={s}>{s}</option>)}
+          {statuses.map(s => (
+            <option key={s}>{s}</option>
+          ))}
         </select>
       </div>
 
@@ -73,10 +99,14 @@ function App() {
             value={job.status}
             onChange={e => updateStatus(job.id, e.target.value)}
           >
-            {statuses.map(s => <option key={s}>{s}</option>)}
+            {statuses.map(s => (
+              <option key={s}>{s}</option>
+            ))}
           </select>
           <span>{job.date}</span>
-          <button className="delete" onClick={() => removeJob(job.id)}>✕</button>
+          <button className="delete" onClick={() => removeJob(job.id)}>
+            ✕
+          </button>
         </div>
       ))}
     </div>
