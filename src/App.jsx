@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 
-export default function App() {
+const statuses = ["Applied", "Interview", "Offer", "Rejected"];
+
+function App() {
   const [jobs, setJobs] = useState([]);
   const [company, setCompany] = useState("");
   const [role, setRole] = useState("");
@@ -19,10 +21,7 @@ export default function App() {
 
   const addJob = () => {
     if (!company || !role || !date) return;
-    setJobs([
-      ...jobs,
-      { id: Date.now(), company, role, date, status: "Applied" },
-    ]);
+    setJobs([...jobs, { id: Date.now(), company, role, date, status: "Applied" }]);
     setCompany("");
     setRole("");
     setDate("");
@@ -32,15 +31,14 @@ export default function App() {
     setJobs(jobs.map(j => j.id === id ? { ...j, status } : j));
   };
 
-  const deleteJob = id => {
+  const removeJob = (id) => {
     setJobs(jobs.filter(j => j.id !== id));
   };
 
-  const filteredJobs =
-    filter === "All" ? jobs : jobs.filter(j => j.status === filter);
+  const shownJobs = filter === "All" ? jobs : jobs.filter(j => j.status === filter);
 
   return (
-    <div className="container">
+    <div className="app">
       <h1>Job Application Tracker</h1>
 
       <div className="form-row">
@@ -54,10 +52,7 @@ export default function App() {
         <p>Total jobs: {jobs.length}</p>
         <select value={filter} onChange={e => setFilter(e.target.value)}>
           <option>All</option>
-          <option>Applied</option>
-          <option>Interview</option>
-          <option>Offer</option>
-          <option>Rejected</option>
+          {statuses.map(s => <option key={s}>{s}</option>)}
         </select>
       </div>
 
@@ -69,26 +64,23 @@ export default function App() {
         <span>Action</span>
       </div>
 
-      {filteredJobs.map(job => (
+      {shownJobs.map(job => (
         <div className="job-row" key={job.id}>
           <span>{job.company}</span>
           <span>{job.role}</span>
-
           <select
             className={`status ${job.status.toLowerCase()}`}
             value={job.status}
             onChange={e => updateStatus(job.id, e.target.value)}
           >
-            <option>Applied</option>
-            <option>Interview</option>
-            <option>Offer</option>
-            <option>Rejected</option>
+            {statuses.map(s => <option key={s}>{s}</option>)}
           </select>
-
           <span>{job.date}</span>
-          <button className="delete" onClick={() => deleteJob(job.id)}>✕</button>
+          <button className="delete" onClick={() => removeJob(job.id)}>✕</button>
         </div>
       ))}
     </div>
   );
 }
+
+export default App;
