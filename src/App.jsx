@@ -10,10 +10,7 @@ function App() {
   const [role, setRole] = useState("");
   const [followUp, setFollowUp] = useState("");
   const [filter, setFilter] = useState("All");
-  const [notification, setNotification] = useState("");
-  const [theme, setTheme] = useState(
-    () => localStorage.getItem("theme") || "light"
-  );
+  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "dark");
 
   const isDark = theme === "dark";
 
@@ -24,15 +21,6 @@ function App() {
   useEffect(() => {
     localStorage.setItem("theme", theme);
   }, [theme]);
-
-  useEffect(() => {
-    const today = new Date().toLocaleDateString("en-CA");
-    const dueToday = jobs.filter(j => j.followUp === today);
-    if (dueToday.length > 0) {
-      setNotification("Follow-up today: " + dueToday.map(j => j.company).join(", "));
-      setTimeout(() => setNotification(""), 5000);
-    }
-  }, []);
 
   function addJob() {
     if (!company || !role) return;
@@ -57,22 +45,22 @@ function App() {
           font-family:system-ui;
         }
 
+        .dark { background:#0b1220; color:#f1f5f9; }
         .light { background:#eef2f7; color:#111; }
-        .dark { background:#0f172a; color:#f1f5f9; }
 
         .app { width:900px; }
 
-        h1 { text-align:center; margin-bottom:20px; }
+        h1 { text-align:center; margin:15px 0 25px; }
 
         .card {
-          padding:20px;
-          border-radius:12px;
-          box-shadow:0 10px 20px rgba(0,0,0,.15);
+          padding:18px;
+          border-radius:14px;
+          background:#1e293b;
+          box-shadow:0 15px 30px rgba(0,0,0,.3);
           margin-bottom:20px;
         }
 
         .light .card { background:white; }
-        .dark .card { background:#1e293b; }
 
         .form {
           display:grid;
@@ -81,24 +69,35 @@ function App() {
         }
 
         input, select {
-          padding:10px;
-          border-radius:8px;
+          height:42px;
+          padding:0 12px;
+          border-radius:10px;
+          border:1px solid #334155;
+          background:#0f172a;
+          color:#f1f5f9;
+        }
+
+        .light input, .light select {
+          background:white;
+          color:#111;
           border:1px solid #ccc;
         }
 
-        .dark input, .dark select {
-          background:#0f172a;
-          color:#f1f5f9;
-          border:1px solid #334155;
-        }
-
         button {
-          padding:10px 14px;
-          border-radius:8px;
+          height:42px;
+          padding:0 18px;
+          border-radius:10px;
           border:none;
-          background:#4f46e5;
+          background:#6366f1;
           color:white;
           cursor:pointer;
+        }
+
+        .theme-btn {
+          background:transparent;
+          border:1px solid currentColor;
+          color:inherit;
+          margin-bottom:15px;
         }
 
         .topbar {
@@ -111,34 +110,37 @@ function App() {
         .list {
           display:grid;
           gap:12px;
-          margin-top:20px;
         }
 
-        .job {
+        /* SAME GRID FOR HEADER AND ROWS */
+        .row {
           display:grid;
-          grid-template-columns:2fr 2fr 1fr 1fr auto;
-          gap:10px;
+          grid-template-columns:2fr 2fr 1.2fr 1.2fr auto;
           align-items:center;
-          padding:16px;
-          border-radius:10px;
-          border:1px solid #e5e7eb;
-        }
-
-        .dark .job {
-          border:1px solid #334155;
+          gap:12px;
+          padding:14px 16px;
+          border-radius:14px;
           background:#1e293b;
+          border:1px solid #334155;
         }
 
-        .light .job {
-          background:white;
+        .light .row { background:white; border:1px solid #e5e7eb; }
+
+        .header {
+          background:transparent;
+          border:none;
+          font-weight:700;
+          opacity:.7;
         }
 
-        .badge {
-          padding:4px 12px;
+        .status {
+          height:32px;
           border-radius:20px;
           font-size:12px;
+          font-weight:700;
+          padding:0 10px;
           color:white;
-          text-align:center;
+          border:none;
         }
 
         .Applied { background:#2563eb; }
@@ -146,34 +148,18 @@ function App() {
         .Offer { background:#16a34a; }
         .Rejected { background:#dc2626; }
 
-        .notify {
-          background:#fde68a;
-          color:#111;
-          padding:10px;
-          border-radius:10px;
-          margin-bottom:15px;
-          font-weight:600;
-        }
-
-        .dark .notify {
-          background:#facc15;
-          color:#000;
-        }
-
-        .theme-btn {
-          background:transparent;
-          border:1px solid currentColor;
-          color:inherit;
-          margin-bottom:15px;
+        .delete-btn {
+          width:40px;
+          height:40px;
+          border-radius:12px;
+          background:#4f46e5;
         }
       `}</style>
 
       <div className="app">
         <button className="theme-btn" onClick={() => setTheme(isDark ? "light" : "dark")}>
-          {isDark ? "☀️ Light Mode" : "🌙 Dark Mode"}
+          {isDark ? "☀ Light" : "🌙 Dark"}
         </button>
-
-        {notification && <div className="notify">🔔 {notification}</div>}
 
         <h1>Job Application Tracker</h1>
 
@@ -198,13 +184,37 @@ function App() {
         </div>
 
         <div className="list">
+          {/* Header */}
+          <div className="row header">
+            <div>Company</div>
+            <div>Role</div>
+            <div>Status</div>
+            <div>Follow-up</div>
+            <div>Action</div>
+          </div>
+
           {filteredJobs.map((job, index) => (
-            <div className="job" key={index}>
+            <div className="row" key={index}>
               <div><strong>{job.company}</strong></div>
               <div>{job.role}</div>
-              <div className={`badge ${job.status}`}>{job.status}</div>
-              <div>{job.followUp || "No date"}</div>
-              <button onClick={() => setJobs(jobs.filter(j => j !== filteredJobs[index]))}>✕</button>
+
+              <select
+                className={`status ${job.status}`}
+                value={job.status}
+                onChange={e => {
+                  const updated = [...jobs];
+                  updated[jobs.indexOf(filteredJobs[index])].status = e.target.value;
+                  setJobs(updated);
+                }}
+              >
+                <option>Applied</option>
+                <option>Interview</option>
+                <option>Offer</option>
+                <option>Rejected</option>
+              </select>
+
+              <div>{job.followUp || "—"}</div>
+              <button className="delete-btn" onClick={() => setJobs(jobs.filter(j => j !== filteredJobs[index]))}>✕</button>
             </div>
           ))}
         </div>
