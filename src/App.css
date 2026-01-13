@@ -67,3 +67,50 @@
     display: none; /* hide big header on small screens */
   }
 }
+@media (max-width: 768px) {
+  .container {
+    width: 95%;
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    text-align: center;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-row input,
+  .form-row button {
+    width: 100%;
+  }
+
+  .top-row {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .table-header {
+    display: none; /* hide desktop header on phone */
+  }
+
+  .job-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .job-row span,
+  .job-row select,
+  .job-row button {
+    width: 100%;
+  }
+
+  .job-row .delete {
+    align-self: flex-end;
+  }
+}
